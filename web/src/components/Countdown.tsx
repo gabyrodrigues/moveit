@@ -1,4 +1,5 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useContext } from 'react';
+import { ChallengesContext } from '../contexts/ChallengesContext';
 
 import styles from '../styles/components/Countdown.module.css';
 
@@ -8,6 +9,8 @@ export default function Countdown() {
   const [time, setTime] = useState(0.1 * 60); //colocando minutos pra segundos
   const [isActive, setIsActive] = useState(false); //armazena se o countdown está ativo ou não (pause/play)
   const [hasFinished, setHasFinished] = useState(false);
+
+  const { startNewChallenge } = useContext(ChallengesContext);
 
   const minutes = Math.floor(time / 60); //tempo em minutos arrendondando pra baixo
   const seconds = time % 60; //resto da divisão são os segundos
@@ -33,6 +36,7 @@ export default function Countdown() {
     } else if (isActive && time === 0) { //se o countdown ainda estiver ativo e o tempo chegou a 0, declara que finalizou o tempo
       setHasFinished(true);
       setIsActive(false);
+      startNewChallenge();
     }
   }, [isActive, time]);
 
