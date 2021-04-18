@@ -2,9 +2,11 @@ import { useState, useEffect } from 'react';
 
 import styles from '../styles/components/Countdown.module.css';
 
+let countdownTimeout: NodeJS.Timeout;
+
 export default function Countdown() {
   const [time, setTime] = useState(25 * 60); //colocando minutos pra segundos
-  const [active, setActive] = useState(false); //armazena se o countdown está ativo ou não (pause/play)
+  const [isActive, setIsActive] = useState(false); //armazena se o countdown está ativo ou não (pause/play)
 
   const minutes = Math.floor(time / 60); //tempo em minutos arrendondando pra baixo
   const seconds = time % 60; //resto da divisão são os segundos
@@ -13,16 +15,21 @@ export default function Countdown() {
   const [secondLeft, secondRight] = String(seconds).padStart(2, '0').split('');
 
   function startCountdown () {
-    setActive(true);
+    setIsActive(true);
+  }
+
+  function resetCountdown () {
+    clearTimeout(countdownTimeout); //cancelando a execução do setTimeout, evitando que no pause ele tire 1s depois de clicar no botão de pause
+    setIsActive(false);
   }
 
   useEffect(() => {
-    if(active && time > 0) {
-      setTimeout(() => {
+    if(isActive && time > 0) {
+      countdownTimeout = setTimeout(() => {
         setTime(time - 1);
       }, 1000);
     }
-  }, [active, time]);
+  }, [isActive, time]);
 
   return (
     <>
@@ -38,13 +45,24 @@ export default function Countdown() {
         </div>
       </div>
 
-      <button
-        type="button"
-        className={styles.countdownButton}
-        onClick={startCountdown}
-      >
-        Iniciar um ciclo
-      </button>
+      { isActive ? (
+          <button
+            type="button"
+            className={`${styles.countdownButton} ${styles.countdownButtonActive} `}
+            onClick={resetCountdown}
+          >
+            Abandonar ciclo
+          </button>
+        ) : (
+          <button
+            type="button"
+            className={styles.countdownButton}
+            onClick={startCountdown}
+          >
+            Iniciar um ciclo
+          </button>
+        )
+      }
     </>
   );
 }
